@@ -1,18 +1,99 @@
 #!/usr/bin/python3
 
-import sys
 import boto3
 import paramiko
 import socket
 import time
 from botocore.exceptions import ClientError
 from contextlib import closing
+import func
 
 # Create EC2 Instance in the default VPC
-ec2 = boto3.client('ec2', region_name='eu-east-2')
-vpc = ec2.create_default_vpc()
-vpc_id = vpc['VpcId']
+print('Start script')
 
+print('Get list VPCs')
+ec2 = boto3.client('ec2')
+response = ec2.describe_vpcs(
+    Filters=[
+        {
+            'Name': 'tag:Name',
+            'Values': [
+                'GrafanaVPC',
+            ]
+        },
+    ]
+)
+
+resp = response['Vpcs']
+if resp:
+    print('VPC exist')
+    ec2 = boto3.client('ec2')
+    vpc = ec2.describe_vpcs(
+        Filters=[
+            {
+                'Name': 'tag:Name',
+                'Values': [
+                    'GrafanaVPC',
+                ]
+            },
+        ]
+    )
+    vpc_id = vpc.get('Vpcs', [{}])[0].get('VpcId', '')
+else:
+    print('No VPC, creating...')
+    ec2 = boto3.client('ec2')
+    vpc = ec2.create_vpc(
+        CidrBlock='172.16.0.0/16',
+        TagSpecifications=[
+            {
+                'ResourceType': 'vpc',
+                'Tags': [
+                    {
+                        'Key': 'Name',
+                        'Value': 'GrafanaVPC'
+                    },
+                ]
+            },
+        ],
+    )
+    vpc = ec2.describe_vpcs(
+        Filters=[
+            {
+                'Name': 'tag:Name',
+                'Values': [
+                    'GrafanaVPC',
+                ]
+            },
+        ]
+    )
+    vpc_id = vpc.get('Vpcs', [{}])[0].get('VpcId', '')
+    ec2.modify_vpc_attribute(VpcId=vpc_id, EnableDnsSupport={'Value': True})
+    ec2.modify_vpc_attribute(VpcId=vpc_id, EnableDnsHostnames={'Value': True})
+    print('Enabled public dns hostname so that we can SSH into it later')
+    internetgateway = ec2.create_internet_gateway()
+    vpc.attach_internet_gateway(
+        InternetGatewayId=internetgateway.get('InternetGateway').get('InternetGatewayId', ''),
+        VpcId=vpc_id
+    )
+    print('Created an internet gateway and attach it to VPC')
+    routetable = vpc.create_route_table()
+    route = routetable.create_route(
+        DestinationCidrBlock='0.0.0.0/0',
+        GatewayId=internetgateway.get('InternetGateway').get('InternetGatewayId', ''),
+    )
+    subnet = ec2.create_subnet(
+        CidrBlock='172.16.1.0/24',
+        VpcIds=vpc_id,
+    )
+    print(subnet)
+    routetable.associate_with_subnet(SubnetId=subnet.id)
+    print('VPC created')
+
+vpc_id = vpc.get('Vpcs', [{}])[0].get('VpcId', '')
+print('VpcId = %s.' % vpc_id)
+exit()
+
+ec2 = boto3.client('ec2')
 instance = ''
 try:
     instance = ec2.describe_instances(
@@ -71,8 +152,8 @@ else:
     print('SG GrafanaSG does not exist. Creating...')
     try:
         grafana_sg = ec2.create_security_group(GroupName='GrafanaSG',
-                                             Description='Grafana Monitoring SG',
-                                             VpcId=vpc_id)
+                                               Description='Grafana Monitoring SG',
+                                               VpcId=vpc_id)
         security_group_id = grafana_sg['GroupId']
         print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
 
@@ -115,7 +196,7 @@ instance.modify_attribute(
 print('EC2 Instance ID %s attached to Security Group GrafanaSG.' % instance_id)
 
 volume = ec2.create_volume(
-    AvailabilityZone='eu-west-1c',
+    AvailabilityZone='us-east-1a',
     Size=1,
     VolumeType='standard',
     TagSpecifications=[
