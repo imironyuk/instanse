@@ -6,5 +6,4 @@
 ### Script execution
 
 1. Get default VPC ID
-2. ПОШЕЛ НАХУЙ ЖЕНЯ
-.
+2.
