@@ -11,3 +11,9 @@
 4. Create Instance `t2.micro` with SG and Keypair that we created earlier
 5. Expect the availability of Instance via SSH protocol which works on port 22
 6. Copy the `script.sh` to the instance and run it on it
+
+### The `script.sh` does the following
+
+1. Install `httpd` and `git` (`httpd` - Apache web server)
+2. Enable and start `httpd` (enable - means that the `httpd` service will start  on the system startup)
+3. 
