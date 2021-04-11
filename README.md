@@ -5,7 +5,7 @@
 
 ### Description of the script operation
 
-1. Get default VPC ID
+1. Automatically gets default `vpc_id`
 2. Idempotent Security Group verification (create if not exist or get Security Group ID)
 3. Create SSH key Pair in AWS and get Private Key
 4. Create Instance `t2.micro` with SG and Keypair that we created earlier
