@@ -1,9 +1,9 @@
-### Before running script
+### Requirements
 
 1. Configure AWS CLI according to the [official guide](https://docs.aws.amazon.com/cli/latest/userguide/install-cliv2.html) set region to `us-east-1`
 3. Install `boto3` and `botocore` python libraries
 
-### Script execution
+### Description of the script operation
 
 1. Get default VPC ID
 2. Idempotent Security Group verification (create if not exist or get Security Group ID)
