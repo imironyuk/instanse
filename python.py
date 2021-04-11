@@ -11,8 +11,11 @@ client = boto3.client('ec2')
 waiter = client.get_waiter('instance_status_ok')
 instance = ec2.Instance('id')
 email_send = 'daniilmironyuk@gmail.com'
+
+print('Getting the default VPC ID')
 response = client.describe_vpcs()
 vpc_id = response.get('Vpcs', [{}])[0].get('VpcId', '')
+print('VPC ID: %s' % (vpc_id))
 
 btcusd_sg = client.describe_security_groups(GroupNames=['BTCUSD'])
 if btcusd_sg != '':
