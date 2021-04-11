@@ -11,14 +11,11 @@
 4. Create Instance `t2.micro` with SG and Keypair that we created earlier
 5. Expect the availability of Instance via SSH protocol which works on port 22
 6. Copy the `script.sh` to the instance and run it on it
-
-### The `script.sh` does the following
-
-1. Install `httpd` and `git` (`httpd` - Apache web server)
-2. Enable and start `httpd` (enable - means that the `httpd` service will start  on the system startup)
-3. Clone GIT repository: https://github.com/imironyuk/BTCUSD.git which contains a web page that displays the BTC to USD rate and draws bars by the time
-4. Copy Web page with CSS modules to `/var/www/html/`
-5. Reload `httpd` service in order for the web page to be displayed on the Apache
-6. Create `reload.sh` script which pick up changes from GIT and refresh the page
-7. Setup `crontab` which will pick up changes from GIT every minute and refresh the page (runs `reload.sh` once per minute)
-8. Displays the link that will be used to access our page
+   1. Install `httpd` and `git` (`httpd` - Apache web server)
+   2. Enable and start `httpd` (enable - means that the `httpd` service will start  on the system startup)
+   3. Clone GIT repository: https://github.com/imironyuk/BTCUSD.git which contains a web page that displays the BTC to USD rate and draws bars by the time
+   4. Copy Web page with CSS modules to `/var/www/html/`
+   5. Reload `httpd` service in order for the web page to be displayed on the Apache
+   6. Create `reload.sh` script which pick up changes from GIT and refresh the page
+   7. Setup `crontab` which will pick up changes from GIT every minute and refresh the page (runs `reload.sh` once per minute)
+   8. Displays the link that will be used to access our page
