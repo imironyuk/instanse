@@ -20,13 +20,13 @@ print('VPC ID: %s' % (vpc_id))
 btcusd_sg = client.describe_security_groups(GroupNames=['BTCUSD'])
 if btcusd_sg != '':
     security_group_id = btcusd_sg.get('SecurityGroups', [{}])[0].get('GroupId', '')
-    print('Security Group BTCUSD already exist %s in vpc %s.' % (security_group_id, vpc_id))
+    print('Security Group BTCUSD already exist %s' % (security_group_id))
 else:
     response_sg_id = client.create_security_group(GroupName='BTCUSD',
                                                   Description='DESCRIPTION',
                                                   VpcId=vpc_id)
     security_group_id = response_sg_id['GroupId']
-    print('Security Group Created %s in vpc %s.' % (security_group_id, vpc_id))
+    print('Security Group Created %s' % (security_group_id))
     data = client.authorize_security_group_ingress(
          GroupId=security_group_id,
          IpPermissions=[
