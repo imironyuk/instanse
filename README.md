@@ -19,3 +19,4 @@
    6. Create `reload.sh` script which pick up changes from GIT and refresh the page
    7. Setup `crontab` which will pick up changes from GIT every minute and refresh the page (runs `reload.sh` once per minute)
    8. Displays the link that will be used to access our page
+.
